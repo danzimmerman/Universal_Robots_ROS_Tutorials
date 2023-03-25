@@ -50,25 +50,33 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 import launch_param_builder
+from moveit_configs_utils import MoveItConfigsBuilder
 
 def launch_setup(context, *args, **kwargs):
 
-    # Initialize Arguments
-    ur_type = LaunchConfiguration("ur_type")
-    safety_limits = LaunchConfiguration("safety_limits")
-    safety_pos_margin = LaunchConfiguration("safety_pos_margin")
-    safety_k_position = LaunchConfiguration("safety_k_position")
-    # General arguments
-    runtime_config_package = LaunchConfiguration("runtime_config_package")
-    controllers_file = LaunchConfiguration("controllers_file")
-    description_package = LaunchConfiguration("description_package")
-    prefix = LaunchConfiguration("prefix")
-    start_joint_controller = LaunchConfiguration("start_joint_controller")
-    initial_joint_controller = LaunchConfiguration("initial_joint_controller")
-    launch_rviz = LaunchConfiguration("launch_rviz")
+    # Initialize arguments 
 
+    args_to_declare = [
+        "ur_type",
+        "safety_limits",
+        "safety_pos_margin",
+        "safety_k_position",
+        "runtime_config_package",
+        "controllers_file",
+        "description_package",
+        "prefix",
+        "start_joint_controller",
+        "initial_joint_controller",
+        "launch_rviz",
+        "example_type"
+    ]
+    lc_args = {arg:LaunchConfiguration(arg)
+        for arg in args_to_declare
+    }
+
+    initial_joint_controllers = launch_param_builder.load_file()
     initial_joint_controllers = PathJoinSubstitution(
-        [FindPackageShare(runtime_config_package), "config", controllers_file]
+        [FindPackageShare(lc_args["runtime_config_package"]), "config", lc_args["controllers_file"]]
     )
 
     rviz_config_file = PathJoinSubstitution(
@@ -77,56 +85,24 @@ def launch_setup(context, *args, **kwargs):
 
     # description file was ur.urdf.xacro but we need to customize it in this package
 
-   
-
-    param_mappings = dict(
-        safety_limits = safety_limits.perform(context),
-        safety_pos_margin = safety_pos_margin.perform(context),
-        safety_k_position = safety_k_position.perform(context),
-        name = "ur",
-        ur_type = ur_type.perform(context),
-        prefix = prefix.perform(context)
-
+    # I'm using Picknik's launch_param_builder 
+    # I'm not sure I like this either with the .perform(context) but I like it better than having to
+    # chain together a bunch of empty spaces. 
+    param_mappings = {ak:arg.perform(context) for ak, arg in lc_args}
+    param_mappings.update(
+        dict(
+            sim_gazebo="true",
+        )
     )
-
-    robot_desc_pb = launch_param_builder.ParameterBuilder()
-    robot_desc_pb.xacro_parameter("robot_description", )
-    robot_desc_pb.to_dict()
     
-    robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            PathJoinSubstitution(
-                [FindPackageShare(description_package), "urdf", description_file]
-            ),
-            " ",
-            "safety_limits:=",
-            safety_limits,
-            " ",
-            "safety_pos_margin:=",
-            safety_pos_margin,
-            " ",
-            "safety_k_position:=",
-            safety_k_position,
-            " ",
-            "name:=",
-            "ur",
-            " ",
-            "ur_type:=",
-            ur_type,
-            " ",
-            "prefix:=",
-            prefix,
-            " ",
-            "sim_gazebo:=true",
-            " ",
-            "simulation_controllers:=",
-            initial_joint_controllers,
-        ]
-    )
-    robot_description = {"robot_description": robot_description_content}
-
+    # ParameterBuilder 
+    robot_desc_pb = launch_param_builder.ParameterBuilder("ur_examples_gazebo_classic")
+    robot_desc_pb.xacro_parameter("robot_description", 
+                                  "urdf/example_ur.urdf.xacro",
+                                   mappings=param_mappings)
+    
+    robot_description = robot_desc_pb.to_dict()
+    print(robot_description)
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -261,7 +237,7 @@ def generate_launch_description():
             "example_type",
             default_value="basic",
             description="Selects the robot and environment for the different examples.",
-            choices=["basic", "soft_mount_robot"]
+            choices=["basic", "soft_base"]
         )
     )
     declared_arguments.append(
