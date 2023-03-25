@@ -13,8 +13,11 @@
   <test_depend>ament_lint_common</test_depend>
 
   <depend>ur_description</depend>
+  <depend>ur_simulation_gazebo</depend>
   <depend>gazebo_ros_pkgs</depend>
   <depend>gazebo_ros2_control</depend>
+  <depend>ros2_controllers_test_nodes</depend>
+  <depend>launch_param_builder</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
