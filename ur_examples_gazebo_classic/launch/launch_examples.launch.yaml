@@ -1,3 +1,4 @@
+# YAML launch XML argument declaration examples
 launch:
 - arg:
     name: simple_arg

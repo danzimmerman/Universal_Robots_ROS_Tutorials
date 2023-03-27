@@ -1,10 +1,13 @@
+# Python launch XML argument declaration examples 
+
 import launch
 import launch_ros
 launch.frontend
 def launch_value_logger(context, *args, **kwargs):
     """
-    Gets the names and values of the launch files LaunchConfiguration objects 
-    and prints LogInfo messages with their values.
+    This Python implementation also shows how to introspect the launch context in
+    an OpaqueFunction and how to use launch.actions.LogInfo to log
+    messages from a launch file.
     """
     info_log_items = []
 
