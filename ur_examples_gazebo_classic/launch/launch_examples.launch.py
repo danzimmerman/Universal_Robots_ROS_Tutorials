@@ -8,7 +8,7 @@ def launch_value_logger(context, *args, **kwargs):
     """
     info_log_items = []
 
-    info_log_items.append(launch.actions.LogInfo(msg="*** test.launch.py Launch Configuration Values ***"))
+    info_log_items.append(launch.actions.LogInfo(msg="\n\n===== launch_examples.launch.py Launch Configuration Values ====="))
     
     # The launch context has a dict called .launch_configurations that contains the names 
     # and contextual values of the launch file's LaunchConfiguration objects.
@@ -56,12 +56,12 @@ def generate_launch_description():
         )
     )
 
-    share = launch_ros.substitutions.FindPackageShare(package="launch")
+    share = launch_ros.substitutions.FindPackageShare(package="ur_examples_gazebo_classic")
     declared_args.append(
         launch.actions.DeclareLaunchArgument(
             "file_in_package_arg",
             default_value=launch.substitutions.PathJoinSubstitution(
-                [share] + "relative/path/to/package.file".split("/") #I really hate this, there must be a way we can use the frontend to do this well in Python
+                [share] + "launch/launch_examples.launch.py".split("/") #I really hate this, there must be a way we can use the frontend to do this well in Python
             )
         )
     )

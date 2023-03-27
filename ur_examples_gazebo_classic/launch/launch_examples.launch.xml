@@ -16,7 +16,19 @@
         <choice value="choice_3"/>
     </arg>
 
-    <action name="log_action" type="actions.LogInfo">
-        <arg name="a message" message="printing some message"/>
-    </action>
+    <arg name="file_in_package_arg"
+         default="$(find-pkg-share ur_examples_gazebo_classic)/launch/launch_examples.launch.xml"
+    />
+    
+    <let name="vars_output_string" value="&#10;&#10;
+===== launch_examples.launch.xml Launch Configuration Values =====&#10;
+simple_arg has a value of $(var simple_arg)&#10;
+arg_with_default has a value of $(var arg_with_default)&#10;
+arg_with_default_and_description has a value of $(var arg_with_default_and_description)&#10;
+arg_with_choices has a value of $(var arg_with_choices)&#10;
+file_in_package_arg has a value of $(var file_in_package_arg)
+    "/>
+    <executable cmd="echo $(var vars_output_string)" output="screen"/>
+    
+
 </launch>
