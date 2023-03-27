@@ -10,9 +10,6 @@ find_package(ament_cmake REQUIRED)
 find_package(ur_description REQUIRED)
 find_package(gazebo_ros_pkgs REQUIRED)
 find_package(gazebo_ros2_control REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 
 install(
   DIRECTORY config launch meshes rviz urdf test

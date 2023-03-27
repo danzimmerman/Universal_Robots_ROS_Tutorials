@@ -34,6 +34,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Author: Denis Stogl
+import launch_yaml
 
 from launch import LaunchDescription
 from launch.actions import (

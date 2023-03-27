@@ -1,0 +1,22 @@
+<launch>
+    <arg name="simple_arg"/>
+    
+    <arg name="arg_with_default" default="1234"/>
+    
+    <arg name="arg_with_default_and_description"
+        default="some_string_arg_value"
+        description="this argument is used to configure ..."/>
+    
+    <arg name="arg_with_choices" 
+         default="choice_1" 
+         description="An argument with several validated choices, defaulting to choice_1.">
+        <!-- In XML, choices are tags inside <arg></arg> tags -->
+        <choice value="choice_1"/>
+        <choice value="choice_2"/>
+        <choice value="choice_3"/>
+    </arg>
+
+    <action name="log_action" type="actions.LogInfo">
+        <arg name="a message" message="printing some message"/>
+    </action>
+</launch>
