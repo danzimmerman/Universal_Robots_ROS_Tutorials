@@ -57,8 +57,7 @@ launch:
     name: "rviz_config_file"
     value: "$(find-pkg-share ur_description)/rviz/view_robot.rviz"
 
-# TODO: see if $(find-exec xacro) works here
-
+# === Process robot xacro into its XML content, save in a variable ===
 - let:
     name: "robot_description_content"
     value: "$(command 
@@ -74,6 +73,7 @@ launch:
        example_type:=$(var example_type)
        ')"
 
+# === Define the nodes to start ===
 - node:
     name: "robot_state_publisher"
     pkg: "robot_state_publisher"
@@ -101,6 +101,15 @@ launch:
     exec: "spawner"
     args: "$(var initial_joint_controller) -c /controller_manager"
 
+- node: 
+    name: "rviz2"
+    pkg: "rviz2"
+    exec: "rviz2"
+    output: "log"
+    args: "-d $(var rviz_config_file)"
+    if: "$(var launch_rviz)"
+
+# === Start Gazebo using an included Python launch file and spawn the robot from topic ===
 - include:
     file: "$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py"
 
