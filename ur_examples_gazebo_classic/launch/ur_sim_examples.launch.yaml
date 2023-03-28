@@ -10,7 +10,7 @@ launch:
     description: "Robot to use in the examples."
 - arg:
     name: "example_type"
-    description: "Selects the robot features, mounting, and environment for different examples."
+    description: "Selects special robot features, mounting, and environment for different examples."
     default: "basic"
     choice: [value: "basic", value: "soft_mount"]
 - arg: 
@@ -38,10 +38,6 @@ launch:
     default: ""
     description: "Prefix of the joint names, useful for multi-robot setup. Make sure to update the controllers' names if you change this."
 - arg:
-    name: "start_joint_controller"
-    default: "True"
-    description: "If true, start the selected joint controller."
-- arg:
     name: "initial_joint_controller"
     default: "joint_trajectory_controller"
     description: "Controller to start and load from those defined in the controllers YAML."
@@ -55,7 +51,7 @@ launch:
     name: "joint_controller_defs"
     value: "$(find-pkg-share ur_simulation_gazebo)/config/$(var controllers_file)"
 - let:
-    name: "robot_xacro"
+    name: "robot_xacro_path"
     value: "$(find-pkg-share ur_examples_gazebo_classic)/urdf/example_ur.urdf.xacro"
 - let:
     name: "rviz_config_file"
@@ -64,9 +60,9 @@ launch:
 # TODO: see if $(find-exec xacro) works here
 
 - let:
-    name: "robot_desc_content"
+    name: "robot_description_content"
     value: "$(command 
-      'xacro $(var robot_xacro) 
+      'xacro $(var robot_xacro_path) 
        name:=ur 
        ur_type:=$(var ur_type)
        safety_limits:=$(var safety_limits)
@@ -76,10 +72,7 @@ launch:
        sim_gazebo:=true
        simulation_controllers:=$(var joint_controller_defs)
        example_type:=$(var example_type)
-      ')"
-
-- executable:
-    cmd: "echo $(var robot_desc_content)"
+       ')"
 
 - node:
     name: "robot_state_publisher"
@@ -94,7 +87,7 @@ launch:
         value: True
       -
         name: "robot_description"
-        value: "$(var robot_desc_content)"
+        value: "$(var robot_description_content)"
 
 - node:
     name: "joint_state_broadcaster_spawner"
