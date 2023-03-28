@@ -58,6 +58,10 @@
 
    <!-- Use property for the parent, set conditionally on example_type -->
    <xacro:property name="example_type" value="$(arg example_type)"/>
+   <!-- xacro:eval-comments:on -->
+   <!-- ur_sim_examples example_type is "${example_type}" -->
+   <!-- xacro:eval-comments:off -->
+
 
    <!-- The basic configuration is just a rigid mount, like always -->
    <xacro:if value="${example_type == 'basic'}">

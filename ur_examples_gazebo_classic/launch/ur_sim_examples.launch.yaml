@@ -2,44 +2,104 @@
 
 launch:
 
+# === Declare launch arguments ===
 - arg:
-    name: ur_type
-    default: ur5e
-    choice: [value: ur3, value: ur3e, value: ur5, value: ur5e, value: ur10, value: ur10e, value: ur16e]
-    description: Robot to use in the examples.
-- arg: # this is the list of arguments you should complete
-    name: safety_limits
+    name: "ur_type"
+    default: "ur5e"
+    choice: [value: "ur3", value: "ur3e", value: "ur5", value: "ur5e", value: "ur10", value: "ur10e", value: "ur16e"]
+    description: "Robot to use in the examples."
+- arg:
+    name: "example_type"
+    description: "Selects the robot features, mounting, and environment for different examples."
+    default: "basic"
+    choice: [value: "basic", value: "soft_mount"]
+- arg: 
+    name: "safety_limits"
     default: "True"
     description: "If true, enable the safety limit controller."
 - arg:
-    name: safety_pos_margin
+    name: "safety_pos_margin"
     default: "0.15"
     description: "The margin to the lower and upper limits in the safety controller."
 - arg:
-    name: safety_k_position
+    name: "safety_k_position"
     default: "20"
     description: "k-position factor in the safety controller."
+- arg: 
+    name: "runtime_config_package"
+    default: "ur_simulation_gazebo"
+    description: "Package with the simulation controllers file specified in controllers_file"
 - arg:
-    name: runtime_config_package
-    default: "ur_simulation-gazebo"
-    description: "Package with the controller's configuration in config folder. Usually not set."
+    name: "controllers_file"
+    default: "ur_controllers.yaml"
+    description: "YAML file in runtime_config_package in the config directory that contains the controllers configuration."
 - arg:
-    name: controllers_file
-    default: "default_controllers.yaml"
-    description: "YAML file with the controllers configuration."
-- arg:
-    name: prefix
+    name: "prefix"
     default: ""
     description: "Prefix of the joint names, useful for multi-robot setup. Make sure to update the controllers' names if you change this."
 - arg:
-    name: start_joint_controller
+    name: "start_joint_controller"
     default: "True"
     description: "If true, start the selected joint controller."
 - arg:
-    name: initial_joint_controller
+    name: "initial_joint_controller"
     default: "True"
     description: "If true, start the joint controller in the initial position."
 - arg:
-    name: launch_rviz
-    default: "True"
+    name: "launch_rviz"
+    default: "False"
     description: "If true, launch RViz."
+
+# === Use subsitutions to set up parameters that need package lookups ===
+- let:
+    name: "initial_joint_controllers"
+    value: "$(find-pkg-share ur_simulation_gazebo)/config/$(var controllers_file)"
+- let:
+    name: "robot_xacro"
+    value: "$(find-pkg-share ur_examples_gazebo_classic)/urdf/example_ur.urdf.xacro"
+- let:
+    name: "rviz_config_file"
+    value: "$(find-pkg-share ur_description)/rviz/view_robot.rviz"
+
+# TODO: see if $(find-exec xacro) works here
+
+- let:
+    name: "robot_desc_content"
+    value: "$(command 
+      'xacro $(var robot_xacro) 
+       name:=ur 
+       ur_type:=$(var ur_type)
+       safety_limits:=$(var safety_limits)
+       safety_pos_margin:=$(var safety_pos_margin)
+       safety_k_position:=$(var safety_k_position)
+       prefix:=$(var prefix)
+       sim_gazebo:=true
+       simulation_controllers:=$(var initial_joint_controllers)
+       example_type:=$(var example_type)
+      ')"
+
+- executable:
+    cmd: "echo $(var robot_desc_content)"
+
+- node:
+    name: "robot_state_publisher"
+    pkg: "robot_state_publisher"
+    exec: "robot_state_publisher"
+    output: "both"
+    # Like choice, param needs to be a list of dicts. The syntax feels a bit strange either way.
+    # The following would work:
+    # param: [
+    #     {name: "use_sim_time", value: True},
+    #     {name: "robot_description", value: "$(var robot_desc_content)"}
+    # ]
+    # But this seems to be the more accepted way:
+    param:
+      -
+        name: "use_sim_time"
+        value: True
+      -
+        name: "robot_description"
+        value: "$(var robot_desc_content)"
+    
+
+
