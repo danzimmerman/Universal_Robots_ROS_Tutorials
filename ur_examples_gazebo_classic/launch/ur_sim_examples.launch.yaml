@@ -1,7 +1,10 @@
-# example_launch.yaml
+# Launches a simulated robot from urdf/example_ur.urdf.xacro 
+# with different features depending on example_type
+# Currently supported values of example_type are:
+#   basic - launch rigid robot as if this were the ur_simulation_gazebo package, no modifications
+#   soft_mount - WIP - launch robot mounted on a non-rigid spring-damper base 
 
 launch:
-
 # === Declare launch arguments ===
 - arg:
     name: "ur_type"
@@ -80,7 +83,7 @@ launch:
     exec: "robot_state_publisher"
     output: "both"
     # Like choice, param needs to be a list of dicts. 
-    # This could be param: [{key: "value"}, ...] but preferred syntax seems to be:
+    # This could be param: [{name: "value"}, ...] but preferred syntax seems to be:
     param:
       -
         name: "use_sim_time"
