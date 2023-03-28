@@ -43,8 +43,8 @@ launch:
     description: "If true, start the selected joint controller."
 - arg:
     name: "initial_joint_controller"
-    default: "True"
-    description: "If true, start the joint controller in the initial position."
+    default: "joint_trajectory_controller"
+    description: "Controller to start and load from those defined in the controllers YAML."
 - arg:
     name: "launch_rviz"
     default: "False"
@@ -52,7 +52,7 @@ launch:
 
 # === Use subsitutions to set up parameters that need package lookups ===
 - let:
-    name: "initial_joint_controllers"
+    name: "joint_controller_defs"
     value: "$(find-pkg-share ur_simulation_gazebo)/config/$(var controllers_file)"
 - let:
     name: "robot_xacro"
@@ -74,7 +74,7 @@ launch:
        safety_k_position:=$(var safety_k_position)
        prefix:=$(var prefix)
        sim_gazebo:=true
-       simulation_controllers:=$(var initial_joint_controllers)
+       simulation_controllers:=$(var joint_controller_defs)
        example_type:=$(var example_type)
       ')"
 
@@ -86,13 +86,8 @@ launch:
     pkg: "robot_state_publisher"
     exec: "robot_state_publisher"
     output: "both"
-    # Like choice, param needs to be a list of dicts. The syntax feels a bit strange either way.
-    # The following would work:
-    # param: [
-    #     {name: "use_sim_time", value: True},
-    #     {name: "robot_description", value: "$(var robot_desc_content)"}
-    # ]
-    # But this seems to be the more accepted way:
+    # Like choice, param needs to be a list of dicts. 
+    # This could be param: [{key: "value"}, ...] but preferred syntax seems to be:
     param:
       -
         name: "use_sim_time"
@@ -100,6 +95,26 @@ launch:
       -
         name: "robot_description"
         value: "$(var robot_desc_content)"
-    
 
+- node:
+    name: "joint_state_broadcaster_spawner"
+    pkg: "controller_manager"
+    exec: "spawner"
+    args: "joint_state_broadcaster -c /controller_manager" 
+
+- node:
+    name: "initial_joint_controller_spawner"
+    pkg: "controller_manager"
+    exec: "spawner"
+    args: "$(var initial_joint_controller) -c /controller_manager"
+
+- include:
+    file: "$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py"
+
+- node:
+    name: "gazebo_robot_spawner"
+    pkg: "gazebo_ros"
+    exec: "spawn_entity.py"
+    args: "-entity ur -topic robot_description"
+    output: "screen"
 
