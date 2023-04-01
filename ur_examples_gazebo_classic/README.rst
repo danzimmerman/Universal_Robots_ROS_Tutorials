@@ -9,8 +9,8 @@ Requirements & Build
 The ``ur_simulation_gazebo`` package is not yet released in binary form.
 
 Currently, this tutorial also needs a customization of the ``ur_description`` and ``ur_simulation_gazebo`` packages provided by
-danzimmerman's forks `here <https://github.com/danzimmerman/Universal_Robots_ROS2_Description/tree/dz/expose-joint-dynamics>`_ and 
-`here <https://github.com/danzimmerman/Universal_Robots_ROS2_Gazebo_Simulation/tree/dz/expose-joint-dynamics>`_.
+danzimmerman's forks `here <https://github.com/danzimmerman/Universal_Robots_ROS2_Description/tree/dz/expose-joint-dyn-props>`_ and 
+`here <https://github.com/danzimmerman/Universal_Robots_ROS2_Gazebo_Simulation/tree/dz/expose-joint-dyn-props>`_.
 
 The fork is necessary to address other simulation issues discussed in `PR #55 <https://github.com/UniversalRobots/Universal_Robots_ROS2_Description/pull/55>`_.
 

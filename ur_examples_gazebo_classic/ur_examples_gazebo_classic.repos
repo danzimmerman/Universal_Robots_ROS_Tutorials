@@ -2,10 +2,10 @@ repositories:
   src/Universal_Robots_ROS2_Description:
     type: git
     url: https://github.com/danzimmerman/Universal_Robots_ROS2_Description
-    version: dz/expose-joint-dynamics
+    version: dz/expose-joint-dyn-props
 
   src/Universal_Robots_ROS2_Gazebo_Simulation:
     type: git
     url: https://github.com/danzimmerman/Universal_Robots_ROS2_Gazebo_Simulation.git
-    version: dz/expose-joint-dynamics
+    version: dz/expose-joint-dyn-props
   
